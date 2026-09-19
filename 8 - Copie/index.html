@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<!-- Aurel — Sites web & aviation légère — Ardenne -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08070B">
+<meta name="description" content="Aurel, pilote ULM basé en Ardenne, conçoit des sites web et de la communication pour les clubs, terrains et écoles de pilotage.">
+<title>Aurel — Sites web &amp; aviation légère · Ardenne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./style.css" rel="stylesheet">
+<script src="./three.min.js"></script>
+<script src="./GLTFLoader.js"></script>
+<style>
+:root{--bg:#08070B;--surface:#0F0E17;--card:#14131F;--bronze:#C5A059;--champ:#E5D2A4;--txt:#F8FAFC;--muted:#94A3B8;--green:#22C55E;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:'JetBrains Mono',monospace;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--bronze);color:var(--bg);}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:rgba(197,160,89,.35);border-radius:3px;}
+.gold{background:linear-gradient(120deg,#E5D2A4 0%,#C5A059 45%,#8a6d35 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.mono-label{font-size:11px;letter-spacing:.4em;color:var(--bronze);text-transform:uppercase;}
+.wrap{max-width:1600px;margin:0 auto;padding:0 24px;}
+@media(min-width:640px){.wrap{padding:0 40px;}}
+
+.noise{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ---------- NAV ---------- */
+header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(8,7,11,.65);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(197,160,89,.15);animation:drop .9s .2s cubic-bezier(.16,1,.3,1) both;}
+@keyframes drop{from{transform:translateY(-80px);opacity:0}to{transform:none;opacity:1}}
+.nav-in{max-width:1600px;margin:0 auto;padding:0 24px;height:72px;display:flex;align-items:center;justify-content:space-between;}
+@media(min-width:640px){.nav-in{padding:0 40px;}}
+.logo{display:flex;align-items:center;gap:12px;font-family:'Syne';font-weight:700;letter-spacing:.15em;font-size:14px;color:var(--txt);text-decoration:none;}
+.logo .ico{width:36px;height:36px;border-radius:50%;border:1px solid rgba(197,160,89,.5);display:flex;align-items:center;justify-content:center;color:var(--bronze);transition:.3s;}
+.logo:hover .ico{background:var(--bronze);color:var(--bg);}
+.logo em{font-style:normal;color:var(--bronze);}
+nav.main{display:none;gap:32px;}
+@media(min-width:1024px){nav.main{display:flex;}}
+nav.main a{font-size:11px;letter-spacing:.25em;color:var(--muted);text-decoration:none;position:relative;transition:color .3s;}
+nav.main a::after{content:'';position:absolute;left:0;bottom:-4px;height:1px;width:0;background:var(--bronze);transition:width .3s;}
+nav.main a:hover{color:var(--champ);}nav.main a:hover::after{width:100%;}
+.nav-right{display:flex;align-items:center;gap:20px;}
+.status{display:none;align-items:center;gap:8px;font-size:10px;letter-spacing:.2em;color:#64748b;}
+@media(min-width:768px){.status{display:flex;}}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2.2s ease-out infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.btn-bronze{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.2em;padding:10px 20px;border-radius:999px;border:1px solid rgba(197,160,89,.6);color:var(--champ);background:transparent;text-decoration:none;cursor:pointer;transition:.3s;}
+.btn-bronze:hover{background:var(--bronze);color:var(--bg);}
+.btn-solid{display:inline-block;font-size:12px;letter-spacing:.2em;padding:14px 28px;border-radius:999px;background:var(--bronze);color:var(--bg);text-decoration:none;font-weight:500;transition:.3s;border:none;cursor:pointer;font-family:'JetBrains Mono';}
+.btn-solid:hover{background:var(--champ);}
+.btn-ghost{display:inline-block;font-size:12px;letter-spacing:.2em;padding:14px 28px;border-radius:999px;border:1px solid #475569;color:#e2e8f0;text-decoration:none;transition:.3s;cursor:pointer;background:transparent;font-family:'JetBrains Mono';}
+.btn-ghost:hover{border-color:var(--bronze);color:var(--champ);}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;height:100vh;min-height:700px;overflow:hidden;}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.hero .veil{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,7,11,.55),rgba(8,7,11,.25) 45%,var(--bg));pointer-events:none;}
+.hero .veil2{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 40%,transparent 0%,rgba(8,7,11,.45) 100%);pointer-events:none;}
+.hero-in{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;pointer-events:none;}
+.hero-in a{pointer-events:auto;}
+.hero .kick{animation:fadeUp .8s .5s both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.hero h1{font-family:'Syne';font-weight:800;line-height:.92;letter-spacing:-.02em;font-size:clamp(44px,13vw,150px);}
+.hero h1 .line{display:block;overflow:hidden;padding-bottom:4px;}
+.hero h1 .line span{display:block;transform:translateY(112%);animation:reveal 1s cubic-bezier(.16,1,.3,1) forwards;}
+.hero h1 .line:nth-child(1) span{animation-delay:.65s}
+.hero h1 .line:nth-child(2) span{animation-delay:.79s}
+.hero h1 .line:nth-child(3) span{animation-delay:.93s}
+@keyframes reveal{to{transform:none}}
+.hero h1 .accent{font-family:'Cormorant Garamond';font-style:italic;font-weight:600;letter-spacing:0;}
+.hero-sub{max-width:28rem;font-size:14px;line-height:1.7;color:#cbd5e1;animation:fadeUp .9s 1.35s both;}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:16px;animation:fadeUp .9s 1.5s both;}
+.hero-bottom{display:flex;flex-direction:column;gap:32px;margin-top:32px;}
+@media(min-width:640px){.hero-bottom{flex-direction:row;align-items:flex-end;gap:64px;}}
+.ring-btn{position:absolute;z-index:3;right:24px;bottom:128px;width:96px;height:96px;background:none;border:none;cursor:pointer;animation:fadeUp .9s 1.7s both;}
+@media(min-width:640px){.ring-btn{right:64px;bottom:160px;width:112px;height:112px;}}
+.ring-btn svg.text-ring{position:absolute;inset:0;animation:spin 18s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ring-btn .core{position:absolute;inset:0;margin:auto;width:48px;height:48px;border-radius:50%;border:1px solid rgba(197,160,89,.5);display:flex;align-items:center;justify-content:center;color:var(--champ);transition:.3s;}
+.ring-btn:hover .core{background:var(--bronze);color:var(--bg);}
+.telemetry{position:absolute;bottom:0;left:0;right:0;z-index:2;border-top:1px solid rgba(197,160,89,.15);background:rgba(8,7,11,.65);backdrop-filter:blur(18px);animation:fadeUp 1s 1.9s both;}
+.telemetry .wrap{padding-top:16px;padding-bottom:16px;display:flex;flex-wrap:wrap;gap:8px 32px;font-size:10px;letter-spacing:.2em;color:var(--muted);}
+@media(min-width:640px){.telemetry .wrap{font-size:11px;}}
+.telemetry .on{display:flex;align-items:center;gap:8px;color:var(--champ);}
+.telemetry .alt{color:var(--bronze);}
+.hero-hint{position:absolute;z-index:2;left:50%;bottom:72px;transform:translateX(-50%);font-size:9px;letter-spacing:.35em;color:#475569;animation:fadeUp 1s 2.2s both;pointer-events:none;}
+
+/* mini DR400 flottant qui suit le défilement */
+.mini-plane{position:fixed;right:20px;bottom:20px;width:76px;height:76px;border-radius:50%;background:rgba(8,7,11,.6);border:1px solid rgba(197,160,89,.35);box-shadow:0 8px 24px rgba(0,0,0,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow:hidden;z-index:80;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(18px) scale(.85);transition:opacity .5s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1),border-color .3s;}
+.mini-plane.show{opacity:1;visibility:visible;transform:none;}
+.mini-plane:hover{border-color:rgba(197,160,89,.8);}
+.mini-plane canvas{width:100%;height:100%;display:block;}
+@media(min-width:768px){.mini-plane{width:92px;height:92px;right:32px;bottom:32px;}}
+
+/* ---------- MARQUEE ---------- */
+.marquee{padding:32px 0;border-top:1px solid rgba(197,160,89,.15);border-bottom:1px solid rgba(197,160,89,.15);background:var(--surface);overflow:hidden;}
+.marquee-track{display:flex;width:max-content;align-items:center;gap:40px;white-space:nowrap;animation:scrollX 45s linear infinite;}
+.marquee:hover .marquee-track{animation-play-state:paused;}
+@keyframes scrollX{to{transform:translateX(-50%)}}
+.marquee-track span.item{font-family:'Cormorant Garamond';font-style:italic;font-size:26px;color:rgba(229,210,164,.9);}
+@media(min-width:640px){.marquee-track span.item{font-size:30px;}}
+.marquee-track span.star{color:var(--bronze);font-size:18px;}
+
+/* ---------- SECTIONS ---------- */
+section.block{padding:112px 0;}
+@media(min-width:640px){section.block{padding:160px 0;}}
+h2.serif-title{font-family:'Cormorant Garamond';font-weight:300;font-size:clamp(34px,5vw,60px);line-height:1.1;margin:16px 0 64px;}
+@media(min-width:640px){h2.serif-title{margin-bottom:96px;}}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1);}
+.reveal.in{opacity:1;transform:none;}
+
+/* chapters */
+.chapter{display:grid;grid-template-columns:1fr;gap:16px;padding:40px 0;border-top:1px solid rgba(197,160,89,.15);}
+.chapter:last-child{border-bottom:1px solid rgba(197,160,89,.15);}
+@media(min-width:768px){.chapter{grid-template-columns:120px 1fr 2fr;gap:40px;padding:56px 0;}}
+.chapter .num{font-size:14px;letter-spacing:.2em;color:var(--bronze);padding-top:8px;display:flex;align-items:center;gap:12px;}
+.chapter .num::after{content:'';height:1px;flex:1;background:rgba(197,160,89,.3);display:none;}
+@media(min-width:768px){.chapter .num::after{display:block;}}
+.chapter:hover .num::after{background:var(--bronze);}
+.chapter h3{font-family:'Syne';font-weight:700;font-size:clamp(22px,3vw,36px);letter-spacing:-.02em;transition:color .5s;}
+.chapter:hover h3{color:var(--champ);}
+.chapter p{font-weight:300;color:#cbd5e1;line-height:1.75;font-size:15px;}
+@media(min-width:640px){.chapter p{font-size:17px;}}
+.chapter p.quote{font-family:'Cormorant Garamond';font-style:italic;font-size:22px;color:var(--champ);}
+@media(min-width:640px){.chapter p.quote{font-size:26px;}}
+
+/* status */
+.panel{border:1px solid rgba(197,160,89,.2);border-radius:16px;background:var(--surface);overflow:hidden;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(197,160,89,.15);}
+@media(min-width:640px){.panel-head{padding:20px 40px;}}
+.panel-head .lbl{font-size:11px;letter-spacing:.35em;color:var(--bronze);}
+.panel-head .live{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.2em;color:#64748b;}
+.panel-grid{display:grid;grid-template-columns:1fr;}
+@media(min-width:640px){.panel-grid{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:1024px){.panel-grid{grid-template-columns:repeat(4,1fr);}}
+.panel-cell{padding:32px 24px;border-bottom:1px solid rgba(197,160,89,.1);transition:background .3s;}
+@media(min-width:640px){.panel-cell{padding:32px 40px;}}
+@media(min-width:1024px){.panel-cell{border-bottom:none;border-right:1px solid rgba(197,160,89,.1);}.panel-cell:last-child{border-right:none;}}
+.panel-cell:hover{background:var(--card);}
+.panel-cell svg{color:var(--bronze);margin-bottom:20px;transition:transform .3s;}
+.panel-cell:hover svg{transform:scale(1.1);}
+.panel-cell .tag{font-size:10px;letter-spacing:.3em;color:#64748b;margin-bottom:8px;}
+.panel-cell .name{font-family:'Cormorant Garamond';font-size:20px;color:#f1f5f9;margin-bottom:12px;}
+.panel-cell .st{font-size:10px;letter-spacing:.2em;color:var(--green);}
+
+/* immersive 3D flow */
+.flow-head{display:flex;flex-direction:column;gap:16px;margin-bottom:40px;}
+@media(min-width:640px){.flow-head{flex-direction:row;align-items:flex-end;justify-content:space-between;}}
+.flow-head h2{font-family:'Cormorant Garamond';font-weight:300;font-size:clamp(34px,5vw,60px);margin-top:16px;}
+.flow-head .src{font-size:11px;letter-spacing:.2em;color:#64748b;}
+.flow-frame{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(197,160,89,.25);background:#000;}
+.flow-frame canvas{width:100%;aspect-ratio:16/9;display:block;}
+.flow-frame .shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,7,11,.85),transparent 50%,rgba(8,7,11,.3));pointer-events:none;}
+.flow-bar{position:absolute;bottom:0;left:0;right:0;padding:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;pointer-events:none;}
+@media(min-width:640px){.flow-bar{padding:40px;}}
+.flow-bar p{font-family:'Cormorant Garamond';font-style:italic;font-size:20px;color:var(--champ);max-width:36rem;line-height:1.3;}
+@media(min-width:640px){.flow-bar p{font-size:28px;}}
+.flow-bar .tag3d{font-size:9px;letter-spacing:.3em;color:#64748b;flex-shrink:0;}
+
+/* projects */
+.bento{display:grid;grid-template-columns:1fr;gap:20px;grid-auto-rows:280px;}
+@media(min-width:1024px){.bento{grid-template-columns:repeat(3,1fr);}}
+.pcard{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(197,160,89,.15);background:var(--card);cursor:pointer;transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .4s;}
+.pcard:hover{transform:translateY(-4px);border-color:rgba(197,160,89,.5);}
+@media(min-width:1024px){.pcard.big{grid-column:span 2;grid-row:span 2;}.pcard.wide{grid-column:span 2;}}
+.pcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45;transition:opacity .7s,transform .7s;}
+.pcard:hover img{opacity:.6;transform:scale(1.05);}
+.pcard .shade{position:absolute;inset:0;background:linear-gradient(to top,var(--bg),rgba(8,7,11,.4),transparent);}
+.pcard .info{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;}
+@media(min-width:640px){.pcard .info{padding:32px;}}
+.pcard .tag{font-size:10px;letter-spacing:.3em;color:var(--bronze);margin-bottom:8px;}
+.pcard h3{font-family:'Cormorant Garamond';font-size:24px;color:#f8fafc;line-height:1.2;}
+@media(min-width:640px){.pcard h3{font-size:30px;}}
+.pcard .desc{font-size:12px;color:var(--muted);margin-top:12px;max-width:28rem;line-height:1.6;}
+.pcard .arrow{position:absolute;top:24px;right:24px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(197,160,89,.4);display:flex;align-items:center;justify-content:center;color:var(--champ);opacity:0;transition:.3s;}
+.pcard:hover .arrow{opacity:1;background:var(--bronze);color:var(--bg);}
+
+/* services */
+.svc-grid{display:grid;grid-template-columns:1fr;gap:48px;}
+@media(min-width:1024px){.svc-grid{grid-template-columns:1fr 1.6fr;gap:80px;}}
+.svc-side{position:sticky;top:128px;align-self:start;}
+@media(max-width:1023px){.svc-side{position:static;}}
+.svc-side p.sub{font-size:14px;font-weight:300;color:var(--muted);line-height:1.7;margin-top:24px;max-width:22rem;}
+.svc-row{display:flex;gap:24px;padding:32px 0;border-top:1px solid rgba(197,160,89,.15);align-items:flex-start;}
+.svc-row:last-child{border-bottom:1px solid rgba(197,160,89,.15);}
+.svc-row .num{font-size:12px;letter-spacing:.2em;color:var(--bronze);padding-top:8px;flex-shrink:0;}
+.svc-row h3{font-family:'Syne';font-weight:700;font-size:clamp(19px,2.2vw,28px);letter-spacing:-.02em;transition:color .3s;display:flex;align-items:center;gap:16px;}
+.svc-row:hover h3{color:var(--champ);}
+.svc-row h3 svg{color:var(--bronze);opacity:0;transform:translateX(-8px);transition:.3s;flex-shrink:0;}
+.svc-row:hover h3 svg{opacity:1;transform:none;}
+.svc-row p{font-weight:300;font-size:14px;color:var(--muted);line-height:1.7;margin-top:12px;max-width:36rem;}
+@media(min-width:640px){.svc-row p{font-size:15px;}}
+
+/* process */
+.process{background:var(--surface);border-top:1px solid rgba(197,160,89,.15);border-bottom:1px solid rgba(197,160,89,.15);position:relative;overflow:hidden;}
+.process .grid-bg{position:absolute;inset:0;opacity:.07;pointer-events:none;background-image:linear-gradient(rgba(197,160,89,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(197,160,89,.6) 1px,transparent 1px);background-size:80px 80px;}
+.process h2{text-align:center;margin-left:auto;margin-right:auto;}
+.process .mono-label{display:block;text-align:center;}
+.steps{display:grid;grid-template-columns:1fr;gap:24px;position:relative;}
+@media(min-width:768px){.steps{grid-template-columns:repeat(3,1fr);}}
+.step{position:relative;border-radius:16px;border:1px solid rgba(197,160,89,.2);background:rgba(8,7,11,.8);padding:32px;transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .4s;}
+@media(min-width:640px){.step{padding:40px;}}
+.step:hover{transform:translateY(-8px);border-color:rgba(197,160,89,.5);}
+.step .bignum{position:absolute;top:24px;right:32px;font-family:'Syne';font-weight:800;font-size:48px;color:transparent;-webkit-text-stroke:1px rgba(197,160,89,.35);}
+.step .ico{width:48px;height:48px;border-radius:50%;border:1px solid rgba(197,160,89,.5);display:flex;align-items:center;justify-content:center;color:var(--bronze);margin-bottom:32px;}
+.step h3{font-family:'Syne';font-weight:700;font-size:20px;margin-bottom:16px;}
+@media(min-width:640px){.step h3{font-size:22px;}}
+.step p{font-weight:300;font-size:14px;color:var(--muted);line-height:1.7;}
+
+/* ---------- CARNET DE BORD (à propos de moi) ---------- */
+section.block.carnet{padding-top:0;}
+.carnet a:focus-visible{outline:2px solid var(--bronze);outline-offset:4px;border-radius:999px;}
+
+.carnet-head{display:flex;align-items:flex-end;gap:32px;margin-bottom:64px;}
+.carnet-head h2{font-family:'Cormorant Garamond';font-weight:300;font-size:clamp(34px,5vw,60px);line-height:1.1;margin-top:16px;flex-shrink:0;}
+.carnet-head .rule{flex:1;min-width:0;height:1px;margin-bottom:16px;background:linear-gradient(90deg,rgba(197,160,89,.55),rgba(197,160,89,0));}
+@media(max-width:639px){.carnet-head .rule{display:none;}}
+
+.carnet-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:64px;align-items:start;}
+@media(min-width:1024px){.carnet-grid{grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:96px;}}
+
+/* texte */
+.carnet-lead{font-family:'Cormorant Garamond';font-weight:300;font-size:clamp(28px,3.3vw,46px);line-height:1.18;letter-spacing:-.005em;color:#F3EBD8;max-width:22em;margin-bottom:40px;}
+.carnet-body{max-width:38rem;}
+.carnet-body p{font-weight:300;font-size:15px;line-height:1.85;color:#b6c0cf;margin-bottom:22px;}
+@media(min-width:640px){.carnet-body p{font-size:16px;}}
+.carnet-quote{margin:44px 0 40px;padding:4px 0 4px 28px;border-left:1px solid var(--bronze);max-width:32rem;}
+.carnet-quote p{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-size:clamp(24px,2.4vw,30px);line-height:1.3;color:var(--champ);margin-bottom:12px;}
+.carnet-quote cite{font-style:normal;font-size:11px;letter-spacing:.2em;color:#7c8aa0;}
+.carnet-cta{display:flex;flex-wrap:wrap;align-items:center;gap:20px;}
+.carnet-cta span{font-size:12px;color:#7c8aa0;letter-spacing:.05em;}
+
+/* fiche pilote */
+.pilot{width:100%;max-width:440px;position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(197,160,89,.24);background:linear-gradient(180deg,var(--card),var(--surface));box-shadow:0 40px 70px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(229,210,164,.06);}
+.pilot-photo{position:relative;aspect-ratio:4/4.4;overflow:hidden;background:radial-gradient(90% 70% at 50% 8%,rgba(197,160,89,.28),transparent 62%),linear-gradient(180deg,#171526 0%,#0b0a12 100%);}
+.pilot-photo svg,.pilot-photo img{position:absolute;inset:0;width:100%;height:100%;}
+.pilot-photo img{object-fit:cover;}
+.pilot-photo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(8,7,11,.75),transparent 40%);}
+.pilot-fig{position:absolute;z-index:2;top:20px;left:22px;font-size:10px;letter-spacing:.25em;color:var(--bronze);}
+.pilot-soon{position:absolute;z-index:2;left:0;right:0;bottom:20px;text-align:center;font-family:'Cormorant Garamond';font-style:italic;font-size:19px;color:rgba(229,210,164,.8);}
+.crop{position:absolute;z-index:2;width:16px;height:16px;border:0 solid rgba(197,160,89,.65);pointer-events:none;}
+.crop.tl{top:14px;left:14px;border-top-width:1px;border-left-width:1px;}
+.crop.tr{top:14px;right:14px;border-top-width:1px;border-right-width:1px;}
+.crop.bl{bottom:14px;left:14px;border-bottom-width:1px;border-left-width:1px;}
+.crop.br{bottom:14px;right:14px;border-bottom-width:1px;border-right-width:1px;}
+.pilot-data{display:grid;grid-template-columns:1fr 1fr;margin:0;}
+.pilot-data div{padding:18px 22px;border-top:1px solid rgba(197,160,89,.15);}
+.pilot-data div:nth-child(odd){border-right:1px solid rgba(197,160,89,.15);}
+.pilot-data dt{font-size:10px;letter-spacing:.18em;color:#7c8aa0;margin-bottom:6px;}
+.pilot-data dd{margin:0;font-family:'Cormorant Garamond';font-size:21px;line-height:1.2;color:#F3EBD8;}
+.pilot-data dd.coord{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.05em;color:var(--champ);padding-top:5px;}
+
+/* planches photo */
+.carnet-mosaic{margin-top:96px;display:grid;gap:16px;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"a a" "b c" "d d";}
+.shot{position:relative;margin:0;border-radius:14px;overflow:hidden;border:1px solid rgba(197,160,89,.18);background:var(--card);}
+.shot-a{grid-area:a;aspect-ratio:16/10;}
+.shot-b{grid-area:b;aspect-ratio:4/5;}
+.shot-c{grid-area:c;aspect-ratio:4/5;}
+.shot-d{grid-area:d;aspect-ratio:16/10;}
+@media(min-width:900px){
+  .carnet-mosaic{gap:18px;grid-template-columns:1.5fr 1fr 1fr;grid-template-rows:repeat(2,minmax(0,1fr));grid-template-areas:"a b d" "a c d";height:clamp(480px,42vw,640px);}
+  .shot{aspect-ratio:auto !important;}
+}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.16,1,.3,1);}
+.shot:hover img{transform:scale(1.04);}
+.shot-a img{object-position:58% 50%;}
+.shot-d img{object-position:50% 42%;}
+.shot::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(8,7,11,.88) 0%,rgba(8,7,11,.25) 38%,transparent 60%);}
+.shot figcaption{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:20px 22px;display:flex;flex-direction:column;gap:5px;}
+.shot .fig{font-size:10px;letter-spacing:.22em;color:var(--bronze);}
+.shot .cap-t{font-family:'Cormorant Garamond';font-style:italic;font-size:clamp(20px,1.7vw,25px);line-height:1.15;color:#F6EEDB;}
+@media(prefers-reduced-motion:reduce){.shot img{transition:none;}.shot:hover img{transform:none;}}
+
+/* contact */
+.contact-grid{display:grid;grid-template-columns:1fr;gap:64px;}
+@media(min-width:1024px){.contact-grid{grid-template-columns:1fr 1fr;gap:96px;}}
+.contact-info p.lead{font-weight:300;font-size:15px;color:var(--muted);line-height:1.7;max-width:28rem;margin:32px 0 48px;}
+.contact-info .rows{display:flex;flex-direction:column;gap:20px;font-size:14px;}
+.contact-info .rows a,.contact-info .rows span{display:flex;align-items:center;gap:16px;color:#cbd5e1;text-decoration:none;transition:color .3s;}
+.contact-info .rows a:hover{color:var(--champ);}
+.contact-info .rows svg{color:var(--bronze);flex-shrink:0;}
+form.panel{padding:32px;}
+@media(min-width:640px){form.panel{padding:48px;}}
+.field{margin-bottom:32px;}
+.field label{display:block;font-size:10px;letter-spacing:.3em;color:#64748b;margin-bottom:4px;}
+.field input,.field textarea{width:100%;background:transparent;border:none;border-bottom:1px solid #334155;padding:16px 0;font-family:'JetBrains Mono';font-size:14px;color:#f1f5f9;transition:border-color .3s;resize:none;}
+.field input::placeholder,.field textarea::placeholder{color:#475569;}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--bronze);}
+.submit{width:100%;padding:16px;border-radius:999px;background:var(--bronze);color:var(--bg);font-family:'JetBrains Mono';font-size:12px;letter-spacing:.25em;font-weight:500;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:.3s;}
+.submit:hover{background:var(--champ);}
+.submit svg{transition:transform .3s;}
+.submit:hover svg{transform:translate(4px,-4px);}
+.toast{position:fixed;bottom:24px;right:24px;z-index:100;background:var(--card);border:1px solid rgba(197,160,89,.4);border-radius:12px;padding:16px 20px;font-size:13px;color:var(--champ);transform:translateY(150%);transition:transform .5s cubic-bezier(.16,1,.3,1);max-width:320px;}
+.toast.show{transform:none;}
+
+/* footer */
+footer{border-top:1px solid rgba(197,160,89,.15);}
+.foot-brand{display:block;width:100%;text-align:left;font-family:'Syne';font-weight:800;line-height:1;font-size:clamp(52px,14vw,200px);color:transparent;-webkit-text-stroke:1px rgba(197,160,89,.35);background:none;border:none;cursor:pointer;transition:color .5s;padding:0;}
+.foot-brand:hover{color:rgba(197,160,89,.15);}
+.foot-mid{margin-top:48px;display:flex;flex-direction:column;gap:40px;}
+@media(min-width:768px){.foot-mid{flex-direction:row;align-items:flex-end;justify-content:space-between;}}
+.foot-coords{font-size:11px;letter-spacing:.25em;color:#64748b;line-height:2;}
+.foot-coords .b{color:var(--bronze);}
+.foot-nav{display:flex;flex-wrap:wrap;gap:12px 32px;font-size:11px;letter-spacing:.25em;}
+.foot-nav a{color:var(--muted);text-decoration:none;transition:.3s;}
+.foot-nav a:hover{color:var(--champ);}
+.foot-social{display:flex;gap:16px;}
+.foot-social a{width:40px;height:40px;border-radius:50%;border:1px solid #334155;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.3s;}
+.foot-social a:hover{border-color:var(--bronze);color:var(--champ);}
+.foot-legal{margin-top:56px;padding-top:24px;border-top:1px solid rgba(197,160,89,.1);display:flex;flex-direction:column;gap:12px;font-size:10px;letter-spacing:.2em;color:#475569;}
+@media(min-width:640px){.foot-legal{flex-direction:row;justify-content:space-between;}}
+footer .wrap{padding-top:64px;padding-bottom:32px;}
+</style>
+</head>
+<body>
+<div class="noise" aria-hidden="true"></div>
+
+<header>
+  <div class="nav-in">
+    <a class="logo" href="#top">
+      <span class="ico">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M4.93 19.07a10 10 0 0 1 0-14.14M19.07 4.93a10 10 0 0 1 0 14.14M7.76 16.24a6 6 0 0 1 0-8.49M16.24 7.76a6 6 0 0 1 0 8.49"></path></svg>
+      </span>
+      AUREL <em>//</em> ULM-01
+    </a>
+    <nav class="main">
+      <a href="#manifeste">MANIFESTE</a>
+      <a href="#realisations">RÉALISATIONS</a>
+      <a href="#services">SERVICES</a>
+      <a href="#process">PROCESS</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+    <div class="nav-right">
+      <span class="status"><span class="dot"></span>EBSH · EN LIGNE</span>
+      <a class="btn-bronze" href="#contact">VOL D'ESSAI</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO 3D : ULM EN BRONZE -->
+  <section class="hero" id="hero">
+    <canvas id="scene3d" width="2554" height="1305"></canvas>
+    <div class="veil"></div>
+    <div class="veil2"></div>
+    <div class="hero-in wrap">
+      <p class="kick mono-label">AUREL-AERO.BE — SAINT-HUBERT, ARDENNE</p>
+      <h1 style="margin-top:24px">
+        <span class="line"><span>SITES WEB</span></span>
+        <span class="line"><span>&amp; AVIATION</span></span>
+        <span class="line"><span class="accent gold">LÉGÈRE</span></span>
+      </h1>
+      <div class="hero-bottom">
+        <p class="hero-sub">Je m'appelle Aurel, j'ai 16 ans et je vole depuis l'Ardenne. À côté du manche, je construis des sites web et de la communication pour le monde de l'aviation légère — clubs, terrains, écoles de pilotage.</p>
+        <div class="hero-ctas">
+          <a class="btn-solid" href="#realisations">VOIR LES RÉALISATIONS →</a>
+          <a class="btn-ghost" href="#contact">ME CONTACTER ↗</a>
+        </div>
+      </div>
+    </div>
+    <p class="hero-hint">DÉPLACEZ LA SOURIS — L'APPAREIL SUIT VOTRE REGARD</p>
+    <button class="ring-btn" onclick="document.getElementById(&#39;manifeste&#39;).scrollIntoView({behavior:&#39;smooth&#39;})" aria-label="Défiler vers le manifeste">
+      <svg class="text-ring" viewBox="0 0 100 100">
+        <defs><path id="cp" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0"></path></defs>
+        <text fill="#C5A059" style="font-size:8.5px;letter-spacing:2.5px;font-family:&#39;JetBrains Mono&#39;"><textpath href="#cp">MANIFESTE · CARNET DE BORD · EBSH ·</textpath></text>
+      </svg>
+      <span class="core">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(45deg)"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path></svg>
+      </span>
+    </button>
+  </section>
+
+  <!-- Mini DR400 flottant : apparaît quand le héros sort de l'écran, suit le défilement -->
+  <div class="mini-plane" id="miniPlane" title="Retour en haut">
+    <canvas id="scene3d-mini" width="200" height="200"></canvas>
+  </div>
+
+  <!-- MARQUEE -->
+  <div class="marquee">
+    <div class="marquee-track" id="marqueeTrack"><span class="item">EBSH — SAINT-HUBERT</span><span class="star">✦</span><span class="item">PILOTE ULM</span><span class="star">✦</span><span class="item">SITES WEB POUR CLUBS DE VOL</span><span class="star">✦</span><span class="item">ARDENNE · BELGIQUE</span><span class="star">✦</span><span class="item">COMMUNICATION AÉRONAUTIQUE</span><span class="star">✦</span><span class="item">UN BON SITE SE PRÉPARE AU SOL</span><span class="star">✦</span><span class="item">EBSH — SAINT-HUBERT</span><span class="star">✦</span><span class="item">PILOTE ULM</span><span class="star">✦</span><span class="item">SITES WEB POUR CLUBS DE VOL</span><span class="star">✦</span><span class="item">ARDENNE · BELGIQUE</span><span class="star">✦</span><span class="item">COMMUNICATION AÉRONAUTIQUE</span><span class="star">✦</span><span class="item">UN BON SITE SE PRÉPARE AU SOL</span><span class="star">✦</span></div>
+  </div>
+
+  <!-- MANIFESTE -->
+  <section class="block" id="manifeste">
+    <div class="wrap">
+      <p class="mono-label reveal">CARNET DE BORD</p>
+      <h2 class="serif-title reveal">Quatre chapitres, <em class="gold" style="font-style:italic">une trajectoire.</em></h2>
+      <article class="chapter reveal">
+        <span class="num">01</span>
+        <h3>L'ENVOL</h3>
+        <p>J'ai 16 ans, je suis basé en Ardenne et j'ai passé mon brevet ULM. Le vol m'a appris la préparation, la rigueur et le calme — trois choses qu'on retrouve dans chacun de mes projets.</p>
+      </article>
+      <article class="chapter reveal">
+        <span class="num">02</span>
+        <h3>LA VIE DU TERRAIN</h3>
+        <p>C'est en passant du temps sur le terrain que j'ai commencé à voir tout ce qu'il y avait à faire à côté du vol : la communication des clubs, leur visibilité, l'accueil de nouveaux membres.</p>
+      </article>
+      <article class="chapter reveal">
+        <span class="num">03</span>
+        <h3>L'ARCHITECTURE DIGITALE</h3>
+        <p>En dehors du manche, je m'intéresse aux technologies, au web, au design et à l'entrepreneuriat. J'aime apprendre en faisant, et rencontrer les gens qui font vivre ce milieu.</p>
+      </article>
+      <article class="chapter reveal">
+        <span class="num">04</span>
+        <h3>LA MÉTHODE</h3>
+        <p class="quote">« Un bon site, comme un bon vol, se prépare au sol. » — Ma façon de travailler : brief précis, maquette soignée, livraison sans turbulences.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- EN CE MOMENT -->
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="panel reveal">
+        <div class="panel-head">
+          <span class="lbl">EN CE MOMENT</span>
+          <span class="live"><span class="dot"></span>FLUX RADAR EN DIRECT</span>
+        </div>
+        <div class="panel-grid">
+          <div class="panel-cell">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2M9.6 4.6A2 2 0 1 1 11 8H2m10.6 11.4A2 2 0 1 0 14 16H2"></path></svg>
+            <p class="tag">VOL</p><p class="name">Pilotage ULM</p><p class="st">● EN COURS</p>
+          </div>
+          <div class="panel-cell">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M4.93 19.07a10 10 0 0 1 0-14.14M19.07 4.93a10 10 0 0 1 0 14.14M7.76 16.24a6 6 0 0 1 0-8.49M16.24 7.76a6 6 0 0 1 0 8.49"></path></svg>
+            <p class="tag">TERRAIN</p><p class="name"><a href="https://fr.wikipedia.org/wiki/A%C3%A9rodrome_de_Saint-Hubert" style="color: white;"  target="_blank">Terrain de Saint-Hubert</a><p class="st">● ACTIF</p>
+          </div>
+          <div class="panel-cell">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            <p class="tag">WEB</p><p class="name">Sites &amp; communication</p><p class="st">● EN PROD</p>
+          </div>
+          <div class="panel-cell">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <p class="tag">RÉSEAU</p><p class="name">Rencontres et mise en relation</p><p class="st">● OUVERT</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMMERSIF 3D : MÉTAL LIQUIDE -->
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="flow-head reveal">
+        <div>
+          <p class="mono-label">CAPSULE IMMERSIVE</p>
+          <h2>La direction <em class="gold" style="font-style:italic">créative.</em></h2>
+        </div>
+        <p class="src">RENDU 3D EN DIRECT · MÉTAL LIQUIDE</p>
+      </div>
+      <div class="flow-frame reveal">
+        <canvas id="flow3d" width="1518" height="854"></canvas>
+        <div class="shade"></div>
+        <div class="flow-bar">
+          <p>« Un bon site, comme un bon vol, se prépare au sol. »</p>
+          <span class="tag3d">WEBGL · TEMPS RÉEL</span>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
+ <!-- A propos de moi : Carnet de bord -->
+  <section class="block carnet" id="carnet">
+    <div class="wrap">
+      <div class="carnet-head reveal">
+        <div>
+          <p class="mono-label">À PROPOS DE MOI</p>
+          <h2>Carnet de <em class="gold" style="font-style:italic">bord.</em></h2>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+
+      <div class="carnet-grid">
+        <div class="carnet-text reveal">
+          <p class="carnet-lead">J'ai 16 ans, je suis basé en Ardenne et j'ai passé mon brevet ULM.</p>
+          <div class="carnet-body">
+            <p>C'est en passant du temps sur le terrain que j'ai commencé à voir tout ce qu'il y avait à faire à côté du vol : la communication des clubs, leur visibilité, l'accueil de nouveaux membres.</p>
+            <p>En dehors du manche, je m'intéresse aux technologies, au web, au design et à l'entrepreneuriat. J'aime apprendre en faisant, et rencontrer les gens qui font vivre ce milieu.</p>
+            <p>Ce site est un point de départ, pas un catalogue de projets terminés. Si vous gérez un terrain, un club ou une école de pilotage, c'est avec plaisir que j'en discute.</p>
+          </div>
+          <blockquote class="carnet-quote">
+            <p>Un bon site, comme un bon vol, se prépare au sol.</p>
+            <cite>Ma façon de travailler</cite>
+          </blockquote>
+          <div class="carnet-cta">
+            <a class="btn-ghost" href="#contact">M'ÉCRIRE</a>
+            <span>Réponse dès que je remets pied à terre.</span>
+          </div>
+        </div>
+  </section>
+
+  <!-- RÉALISATIONS -->
+  <section class="block" id="realisations" style="padding-top:0">
+    <div class="wrap">
+      <p class="mono-label reveal">RÉALISATIONS</p>
+      <h2 class="serif-title reveal">À quoi pourrait ressembler <em class="gold" style="font-style:italic">votre site.</em></h2>
+      <div class="bento">
+        <article class="pcard big reveal">
+          <img src="./pexels-photo-16733776.jpg" alt="Aérodrome de Saint Hubert" loading="lazy">
+          <div class="shade"></div>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"></path></svg></span>
+          <div class="info">
+            <p class="tag">SITE VITRINE · CLUB</p>
+            <h3>Aérodrome de Saint-Hubert</h3>
+            <p class="desc">Présence en ligne complète pour un aéroclub ardennais : membres, flotte, météo du terrain.</p>
+          </div>
+        </article>
+        <article class="pcard reveal">
+          <img src="./pexels-photo-20152806.jpg" alt="École de pilotage Ciel d&#39;Ardenne" loading="lazy">
+          <div class="shade"></div>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"></path></svg></span>
+          <div class="info">
+            <p class="tag">ÉCOLE · IDENTITÉ</p>
+            <h3>École de pilotage Ciel d'Ardenne</h3>
+            <p class="desc">Site et communication pour attirer de nouveaux élèves pilotes.</p>
+          </div>
+        </article>
+        <article class="pcard reveal">
+          <img src="./photo-1761813409570-ebc80a41c324.jpg" alt="Aérodrome de Saint-Hubert" loading="lazy">
+          <div class="shade"></div>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"></path></svg></span>
+          <div class="info">
+            <p class="tag">CONCEPT · EBSH</p>
+            <h3>Aérodrome de Saint-Hubert</h3>
+            <p class="desc">Concept de plateforme d'information pour le terrain d'attache.</p>
+          </div>
+        </article>
+        <article class="pcard wide reveal">
+          <img src="./photo-1653680207840-c68d77a4f99e.jpg" alt="Fly-in Ardenne 2026" loading="lazy">
+          <div class="shade"></div>
+          <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"></path></svg></span>
+          <div class="info">
+            <p class="tag">ÉVÉNEMENT · BILLETTERIE</p>
+            <h3>Fly-in Ardenne 2026</h3>
+            <p class="desc">Site événementiel pour le rassemblement ULM des Ardennes.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="block" id="services" style="padding-top:0">
+    <div class="wrap svc-grid">
+      <div class="svc-side reveal">
+        <p class="mono-label">CE QUE JE FAIS</p>
+        <h2 class="serif-title" style="margin-bottom:0">Pour un club <em class="gold" style="font-style:italic">ou un terrain.</em></h2>
+        <p class="sub">Quatre services, une même exigence : que votre terrain soit aussi accueillant en ligne qu'au seuil de piste.</p>
+      </div>
+      <div>
+        <div class="svc-row reveal">
+          <span class="num">S.01</span>
+          <div>
+            <h3>Site web simple et clair
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </h3>
+            <p>Un site rapide, lisible et beau, pensé pour les visiteurs comme pour les moteurs de recherche. Vitrine, actualités du club, galerie, météo du terrain.</p>
+          </div>
+        </div>
+        <div class="svc-row reveal">
+          <span class="num">S.02</span>
+          <div>
+            <h3>Communication &amp; contenu
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>
+            </h3>
+            <p>Textes, visuels et publications qui racontent la vie du terrain : comptes rendus de vols, annonces d'événements, appels à nouveaux membres.</p>
+          </div>
+        </div>
+        <div class="svc-row reveal">
+          <span class="num">S.03</span>
+          <div>
+            <h3>Présence en ligne à jour
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </h3>
+            <p>Un site qui ne vieillit pas au hangar : mises à jour régulières, informations fraîches, horaires et coordonnées toujours exacts.</p>
+          </div>
+        </div>
+        <div class="svc-row reveal">
+          <span class="num">S.04</span>
+          <div>
+            <h3>Mise en relation
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"></path></svg>
+            </h3>
+            <p>Je connais le milieu de l'intérieur. Je vous connecte aux bonnes personnes : clubs voisins, instructeurs, partenaires locaux.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="block process" id="process">
+    <div class="grid-bg"></div>
+    <div class="wrap">
+      <p class="mono-label reveal">PROCESS</p>
+      <h2 class="serif-title reveal">Du brief <em class="gold" style="font-style:italic">au décollage.</em></h2>
+      <div class="steps">
+        <div class="step reveal">
+          <span class="bignum">01</span>
+          <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M9 12h6M9 16h6"></path></svg></span>
+          <h3>Brief &amp; plan de vol</h3>
+          <p>On définit la destination ensemble : vos besoins, vos visiteurs, vos contenus. Comme un plan de vol, rien ne décolle sans préparation.</p>
+        </div>
+        <div class="step reveal">
+          <span class="bignum">02</span>
+          <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg></span>
+          <h3>Design &amp; maquette</h3>
+          <p>Je dessine le cockpit : maquette, couleurs, typographies. Vous validez chaque instrument avant la mise en route.</p>
+        </div>
+        <div class="step reveal">
+          <span class="bignum">03</span>
+          <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg></span>
+          <h3>Livraison &amp; décollage</h3>
+          <p>Mise en ligne, formation rapide et suivi. Votre site prend son envol — et je reste joignable sur la fréquence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block" id="contact">
+    <div class="wrap contact-grid">
+      <div class="contact-info reveal">
+        <p class="mono-label">CONTACT</p>
+        <h2 class="serif-title" style="margin-bottom:0">Ouvrez la <em class="gold" style="font-style:italic">fréquence.</em></h2>
+        <p class="lead">Club, terrain, école de pilotage, ou simplement une idée à partager — n'hésitez pas à écrire. Réponse garantie dès que je remets les pieds au sol.</p>
+        <div class="rows">
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>Ardenne, Belgique</span>
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"></circle><path d="M4.93 19.07a10 10 0 0 1 0-14.14M19.07 4.93a10 10 0 0 1 0 14.14M7.76 16.24a6 6 0 0 1 0-8.49M16.24 7.76a6 6 0 0 1 0 8.49"></path></svg>Terrain d'attache : Saint-Hubert — EBSH</span>
+          <a href="mailto:ragnorel@gmail.com"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"></path><path d="M22 2 11 13"></path></svg>ragnorel@gmail.com</a>
+        </div>
+      </div>
+      <form class="panel reveal" id="contactForm">
+        <div class="field">
+          <label for="cf-name">VOTRE NOM / INDICATIF</label>
+          <input id="cf-name" required="" placeholder="Aérodrome de Saint Hubert">
+        </div>
+        <div class="field">
+          <label for="cf-email">VOTRE E-MAIL</label>
+          <input id="cf-email" type="email" required="" placeholder="contact@club.be">
+        </div>
+        <div class="field">
+          <label for="cf-msg">VOTRE MESSAGE</label>
+          <textarea id="cf-msg" rows="4" required="" placeholder="Parlez-moi de votre club, de votre terrain, de votre projet…"></textarea>
+        </div>
+        <button class="submit" type="submit">
+          ENVOYER PAR E-MAIL
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"></path><path d="M22 2 11 13"></path></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <button class="foot-brand" onclick="window.scrollTo({top:0,behavior:&#39;smooth&#39;})">AUREL.AERO</button>
+    <div class="foot-mid">
+      <div class="foot-coords">
+        <p class="b">TERRAIN EBSH — SAINT-HUBERT</p>
+        <p>POS 50.0264° N / 05.3725° E · ALT 1 873 FT · QNH 1013</p>
+        <p>ARDENNE — BELGIQUE</p>
+      </div>
+      <nav class="foot-nav">
+        <a href="#manifeste">MANIFESTE</a>
+        <a href="#realisations">RÉALISATIONS</a>
+        <a href="#services">SERVICES</a>
+        <a href="#process">PROCESS</a>
+        <a href="#contact">CONTACT</a>
+      </nav>
+      <div class="foot-social">
+        <a href="#contact" aria-label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1"></circle></svg></a>
+        <a href="#contact" aria-label="LinkedIn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+        <a href="#contact" aria-label="GitHub"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path></svg></a>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <p>UN BON SITE, COMME UN BON VOL, SE PRÉPARE AU SOL.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">Message prêt au décollage — votre logiciel e-mail s'ouvre avec le message pré-rempli.</div>
+
+<script>
+/* ================= HERO 3D : ULM EN BRONZE (inspiré LAOCOÖN) ================= */
+(function(){
+  var canvas=document.getElementById('scene3d');
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  var scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x08070b,0.055);
+  var camera=new THREE.PerspectiveCamera(45,1,0.1,100);
+  camera.position.set(0,0.6,8);
+
+  /* lumières : ambre chaud + contre-jour bleu électrique, balayage lent */
+  scene.add(new THREE.AmbientLight(0x1c1830,2.2));
+  var key=new THREE.DirectionalLight(0xffb066,4.6); key.position.set(4,5,5); scene.add(key);
+  var fill=new THREE.DirectionalLight(0xE5D2A4,1.6); fill.position.set(-3,2,6); scene.add(fill);
+  var rim=new THREE.PointLight(0x4f7cff,28,30); rim.position.set(-6,2,-5); scene.add(rim);
+  var sweep=new THREE.PointLight(0xc5a059,22,20); scene.add(sweep);
+
+  /* --- modèle 3D : Robin DR400 (.glb) --- */
+  var plane=new THREE.Group();
+  var loader=new THREE.GLTFLoader();
+  loader.load('models/robin_dr400.glb', function(gltf){
+    var model=gltf.scene;
+    var box=new THREE.Box3().setFromObject(model);
+    var center=box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+    var size=box.getSize(new THREE.Vector3());
+    model.scale.setScalar(4.6/Math.max(size.x,size.y,size.z));
+    /* Le fichier exporte le fuselage nez-vers-l'arrière (axe -X) : on le retourne
+       pour que le nez pointe vers +X, dans le sens de vol attendu par la traînée
+       dorée (ancrée en x≈+2.4) et par le cadrage de la caméra. */
+    model.rotation.y=Math.PI;
+
+    /* Filtre sombre : on assombrit chaque matériau (la couleur se multiplie
+       avec la texture dans le shader standard, donc ça fonce l'ensemble
+       tout en gardant les reliefs/reflets des lumières de la scène). */
+    model.traverse(function(child){
+      if(child.isMesh && child.material){
+        var wasArray=Array.isArray(child.material);
+        var mats=wasArray?child.material:[child.material];
+        var newMats=mats.map(function(m){
+          var mm=m.clone();
+          if(mm.color)mm.color.multiplyScalar(0.28);
+          if('metalness' in mm)mm.metalness=Math.min(1,(mm.metalness||0)+0.15);
+          if('roughness' in mm)mm.roughness=Math.max(0.15,(mm.roughness||1)-0.1);
+          mm.needsUpdate=true;
+          return mm;
+        });
+        child.material=wasArray?newMats:newMats[0];
+      }
+    });
+
+    plane.add(model);
+  });
+  plane.position.set(2.3,-0.15,0);
+  plane.rotation.set(0.08,-0.5,0.06);
+  scene.add(plane);
+
+  /* traînée lumineuse dorée (façon LAOCOÖN) */
+  var TRAIL_N=180;
+  var trailPos=new Float32Array(TRAIL_N*3);
+  var trailCol=new Float32Array(TRAIL_N*3);
+  for(var ci=0;ci<TRAIL_N;ci++){
+    var fade=Math.pow(1-ci/TRAIL_N,1.4);
+    trailCol[ci*3]=0.95*fade; trailCol[ci*3+1]=0.78*fade; trailCol[ci*3+2]=0.42*fade;
+  }
+  var trailGeo=new THREE.BufferGeometry();
+  trailGeo.setAttribute('position',new THREE.BufferAttribute(trailPos,3));
+  trailGeo.setAttribute('color',new THREE.BufferAttribute(trailCol,3));
+  var trailLine=new THREE.Line(trailGeo,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.9,blending:THREE.AdditiveBlending,depthWrite:false}));
+  var trailPts=new THREE.Points(trailGeo,new THREE.PointsMaterial({size:0.075,vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(trailLine); scene.add(trailPts);
+  var trailInit=false;
+
+  /* poussière d'étoiles ambrée */
+  var pCount=450,pos=new Float32Array(pCount*3);
+  for(var i=0;i<pCount;i++){
+    var r=4+Math.random()*7,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);
+    pos[i*3]=r*Math.sin(ph)*Math.cos(th); pos[i*3+1]=r*Math.cos(ph)*0.6; pos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
+  }
+  var pGeo=new THREE.BufferGeometry();
+  pGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  var stars=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0xE5D2A4,size:0.035,transparent:true,opacity:0.7,blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(stars);
+
+  var mouse={x:0,y:0},target={x:0,y:0};
+  window.addEventListener('mousemove',function(e){
+    target.x=(e.clientX/window.innerWidth-0.5)*2;
+    target.y=(e.clientY/window.innerHeight-0.5)*2;
+  });
+
+  function resize(){
+    var w=canvas.clientWidth,h=canvas.clientHeight;
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.updateProjectionMatrix();
+    var mobile=w<768;
+    plane.position.x=mobile?0:2.3;
+    plane.scale.setScalar(mobile?0.62:1.0);
+  }
+  window.addEventListener('resize',resize); resize();
+
+  var heroVisible=true;
+  new IntersectionObserver(function(en){heroVisible=en[0].isIntersecting;},{threshold:0}).observe(canvas);
+
+  /* --- mini DR400 flottant : même scène, seconde caméra, apparaît hors du héros --- */
+  var miniEl=document.getElementById('miniPlane');
+  var miniCanvas=document.getElementById('scene3d-mini');
+  var miniRenderer=new THREE.WebGLRenderer({canvas:miniCanvas,antialias:true,alpha:true});
+  miniRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  var miniCamera=new THREE.PerspectiveCamera(32,1,0.1,50);
+  function resizeMini(){
+    var s=miniCanvas.clientWidth||miniEl.clientWidth;
+    if(!s)return;
+    miniRenderer.setSize(s,s,false);
+    miniCamera.aspect=1; miniCamera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize',resizeMini); resizeMini();
+  new IntersectionObserver(function(en){
+    miniEl.classList.toggle('show',!en[0].isIntersecting);
+  },{threshold:0}).observe(canvas);
+  miniEl.addEventListener('click',function(){document.getElementById('top').scrollIntoView({behavior:'smooth'});});
+
+  var clock=new THREE.Clock();
+  (function animate(){
+    requestAnimationFrame(animate);
+    var t=clock.getElapsedTime();
+    mouse.x+=(target.x-mouse.x)*0.04; mouse.y+=(target.y-mouse.y)*0.04;
+    plane.rotation.y=-0.5+Math.sin(t*0.25)*0.28+mouse.x*0.5;
+    plane.rotation.x=0.08+mouse.y*0.22;
+    plane.rotation.z=0.06+Math.sin(t*0.5)*0.04;
+    plane.position.y=-0.15+Math.sin(t*0.8)*0.12;
+    /* mise à jour de la traînée depuis la queue de l'appareil */
+    var tail=new THREE.Vector3(-2.4,0.1,0).applyEuler(plane.rotation).add(plane.position);
+    if(!trailInit){for(var ti=0;ti<TRAIL_N;ti++){trailPos[ti*3]=tail.x;trailPos[ti*3+1]=tail.y;trailPos[ti*3+2]=tail.z;}trailInit=true;}
+    for(var ti=TRAIL_N-1;ti>0;ti--){
+      trailPos[ti*3]=trailPos[(ti-1)*3];
+      trailPos[ti*3+1]=trailPos[(ti-1)*3+1];
+      trailPos[ti*3+2]=trailPos[(ti-1)*3+2];
+    }
+    trailPos[0]=tail.x; trailPos[1]=tail.y; trailPos[2]=tail.z;
+    /* écoulement de la wake vers l'arrière */
+    for(var ti=1;ti<TRAIL_N;ti++){
+      trailPos[ti*3]-=0.035;
+      trailPos[ti*3+1]+=0.006+Math.sin(t*2+ti*0.15)*0.003;
+      trailPos[ti*3+2]+=Math.cos(t*1.6+ti*0.12)*0.004;
+    }
+    trailGeo.attributes.position.needsUpdate=true;
+    stars.rotation.y=t*0.02;
+    sweep.position.set(Math.cos(t*0.6)*6,Math.sin(t*0.4)*3,Math.sin(t*0.6)*6);
+
+    if(heroVisible){
+      camera.position.x=mouse.x*0.5;
+      camera.position.y=0.6-mouse.y*0.35;
+      camera.lookAt(1.2,0.1,0);
+      renderer.render(scene,camera);
+    }
+    if(miniEl.classList.contains('show')){
+      var mp=plane.position;
+      miniCamera.position.set(mp.x-0.15,mp.y+1.05,mp.z+4.4);
+      miniCamera.lookAt(mp.x,mp.y,mp.z);
+      miniRenderer.render(scene,miniCamera);
+    }
+  })();
+})();
+
+/* ================= CAPSULE 3D : VAGUE DE MÉTAL LIQUIDE ================= */
+(function(){
+  var canvas=document.getElementById('flow3d');
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(50,2,0.1,100);
+  camera.position.set(0,3.2,7.5);
+  camera.lookAt(0,0,0);
+
+  var COLS=140,ROWS=70,W=16,H=8;
+  var count=COLS*ROWS;
+  var positions=new Float32Array(count*3);
+  var colors=new Float32Array(count*3);
+  var cBronze=new THREE.Color(0xC5A059),cChamp=new THREE.Color(0xE5D2A4),cBlue=new THREE.Color(0x3b5bff);
+  var idx=0;
+  for(var y=0;y<ROWS;y++){
+    for(var x=0;x<COLS;x++){
+      var px=(x/(COLS-1)-0.5)*W, pz=(y/(ROWS-1)-0.5)*H;
+      positions[idx*3]=px; positions[idx*3+1]=0; positions[idx*3+2]=pz;
+      var mix=x/(COLS-1);
+      var c=mix<0.55?cBronze.clone().lerp(cChamp,mix/0.55):cChamp.clone().lerp(cBlue,(mix-0.55)/0.45);
+      colors[idx*3]=c.r; colors[idx*3+1]=c.g; colors[idx*3+2]=c.b;
+      idx++;
+    }
+  }
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+  var points=new THREE.Points(geo,new THREE.PointsMaterial({size:0.045,vertexColors:true,transparent:true,opacity:0.9,blending:THREE.AdditiveBlending,depthWrite:false}));
+  scene.add(points);
+
+  function resize(){
+    var w=canvas.clientWidth,h=canvas.clientHeight;
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize',resize); resize();
+
+  var visible=false;
+  new IntersectionObserver(function(en){visible=en[0].isIntersecting;},{threshold:0}).observe(canvas);
+
+  var clock=new THREE.Clock();
+  (function animate(){
+    requestAnimationFrame(animate);
+    if(!visible)return;
+    var t=clock.getElapsedTime();
+    var p=geo.attributes.position.array;
+    var i=0;
+    for(var y=0;y<ROWS;y++){
+      for(var x=0;x<COLS;x++){
+        var px=p[i*3],pz=p[i*3+2];
+        p[i*3+1]=Math.sin(px*0.9+t*1.1)*0.45+Math.cos(pz*1.3+t*0.7)*0.35+Math.sin((px+pz)*0.5+t*0.5)*0.25;
+        i++;
+      }
+    }
+    geo.attributes.position.needsUpdate=true;
+    renderer.render(scene,camera);
+  })();
+})();
+
+/* ================= UI ================= */
+/* Altimeter */
+(function(){
+  var el=document.getElementById('alti'),target=1873,start=null;
+  function tick(t){if(!start)start=t;var p=Math.min((t-start)/2200,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3))).toLocaleString('fr-FR');if(p<1)requestAnimationFrame(tick);}
+  requestAnimationFrame(tick);
+})();
+
+/* Marquee */
+(function(){
+  var items=["EBSH — SAINT-HUBERT","PILOTE ULM","SITES WEB POUR CLUBS DE VOL","ARDENNE · BELGIQUE","COMMUNICATION AÉRONAUTIQUE","UN BON SITE SE PRÉPARE AU SOL"];
+  var track=document.getElementById('marqueeTrack'),html='';
+  for(var r=0;r<2;r++){items.forEach(function(i){html+='<span class="item">'+i+'</span><span class="star">✦</span>';});}
+  track.innerHTML=html;
+})();
+
+/* Scroll reveal */
+(function(){
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+})();
+
+/* Contact -> mailto + toast */
+(function(){
+  var form=document.getElementById('contactForm'),toast=document.getElementById('toast');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=document.getElementById('cf-name').value,email=document.getElementById('cf-email').value,msg=document.getElementById('cf-msg').value;
+    var subject=encodeURIComponent('Contact aurel-aero.be — '+name);
+    var body=encodeURIComponent(msg+'\n\n— '+name+' ('+email+')');
+    window.location.href='mailto:ragnorel@gmail.com?subject='+subject+'&body='+body;
+    toast.classList.add('show');
+    setTimeout(function(){toast.classList.remove('show');},4000);
+  });
+})();
+</script>
+
+
+</body></html>
