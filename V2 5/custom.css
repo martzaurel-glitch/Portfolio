@@ -1,0 +1,46 @@
+/* ===== Améliorations de lisibilité et d'accessibilité ===== */
+
+/* --- Hero : ciel plus soutenu pour que le texte blanc reste lisible --- */
+.sky-bg {
+  background: linear-gradient(180deg, #1c67a8 0%, #2f80c2 34%, #5aa4dc 62%, #a9d3f0 86%, #cde5f5 100%);
+}
+.sky-bg::before {
+  background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.10) 0%, transparent 40%),
+                    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.18) 0%, transparent 40%);
+}
+.cloud { opacity: 0.5; }
+#hero h1,
+#hero h2 {
+  text-shadow: 0 2px 16px rgba(9, 40, 72, 0.5), 0 1px 3px rgba(9, 40, 72, 0.35);
+}
+#hero .eyebrow {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: rgba(9, 40, 72, 0.4);
+}
+@media (max-width: 767px) {
+  .cloud { display: none; }
+}
+
+/* --- Contact sur mobile : le bandeau bleu ne passe plus sous le texte --- */
+@media (max-width: 1023px) {
+  #contact [style*="clip-path"] { display: none; }
+  #contact .bg-white.absolute.inset-0 {
+    background-image: linear-gradient(180deg, #ffffff 0%, #e3effa 100%);
+  }
+}
+
+/* --- Cibles tactiles : au moins ~44 px de haut --- */
+footer a[href^="mailto:"],
+#contact a[href^="mailto:"] {
+  display: inline-block;
+  padding: 0.7rem 0;
+}
+footer .grid a {
+  display: inline-block;
+  padding: 0.65rem 0;
+}
+#services a[href="#contact"] {
+  min-height: 44px;
+}
